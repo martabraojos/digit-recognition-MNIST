@@ -283,3 +283,60 @@ for i in range(10):
 
 
 #  not at all what we expected. This is not a good method for this problem.
+
+
+## Lets try to do a neural network 
+
+#I need to modify my set of labels; right now I have a vector with numbers 0 to 9,
+#What I would need is a matrix of wide 10 so 0= (1,0,0,...,0), 1=(0,1,0,...,0)
+labels_array = np.asarray(labels_newtrain)
+labels_matrix = np.zeros((len(labels_newtrain),10))
+#len(labels_newtrain)
+#labels_matrix[0,0]
+
+for i in range(0,len(labels_newtrain)):
+    for j in labels_array[[i]]:
+        labels_matrix[i,j] = 1.
+
+labels_matrix       
+
+#Importing libraries
+from keras.models import Sequential
+from keras.layers import Dense
+
+# create model
+from keras.layers import Dropout
+model = Sequential()
+model.add(Dense(70, input_dim=784, activation='relu')) #784 is the number of features, pixels in my case
+model.add(Dropout(0.2))
+model.add(Dense(30, activation='relu'))  #2 hidden layers,50 and 20 newron respectively Relu is the activation function
+model.add(Dropout(0.2)) ####Lets add a drop out, that I do not know how to use!! :D
+model.add(Dense(10, activation='sigmoid')) #10 is the output layer, the dense mens that they are fully connect
+#sigmoid is the last activation function
+
+# Compile model
+model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+
+# Fit the model
+model.fit(features_newtrain, labels_matrix, epochs=50, batch_size=64)
+
+##Cool accuracy! In then training set
+scores = model.evaluate(features_newtrain, labels_matrix)
+print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+
+#Now, lets try to predict
+predictionsNN = model.predict(features_newtest)
+
+#Preparing the test labels in a comparable way, as we did before:
+#I need to modify my set of labels; right now I have a vector with numbers 0 to 9,
+#What I would need is a matrix of wide 10 so 0= (1,0,0,...,0), 1=(0,1,0,...,0)
+labels_array_test = np.asarray(labels_newtest)
+labels_matrix_test = np.zeros((len(labels_newtest),10))
+
+for i in range(0,len(labels_newtest)):
+    for j in labels_array_test[[i]]:
+        labels_matrix_test[i,j] = 1.
+        
+##Cool accuracy in the test set!
+scores = model.evaluate(features_newtest, labels_matrix_test)
+print("\n%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
